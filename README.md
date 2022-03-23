@@ -4,16 +4,16 @@ This is sample code which adopt DDD architecture written by TS.
 
 ## How to run
 
-work in progress
+WORK IN PROGRESS
 
 ## technologies
 
-serverSide: Express(Node.js)
-frontSide: Next.js(React)
-storage: EventStoreDB, Redis
-messageBroker: RabbitMQ
-API: Apollo(GraphQL)
-others: yarnWorkspace, DockerCompose
+serverSide: Express(Node.js)<br/>
+frontSide: Next.js(React)<br/>
+storage: EventStoreDB, Redis<br/>
+messageBroker: RabbitMQ<br/>
+API: Apollo(GraphQL)<br/>
+others: yarnWorkspace, DockerCompose<br/>
 
 ## Notice
 
@@ -29,7 +29,6 @@ And then you can convert express to a proxy or remove.
 
 I have learned much about DDD in their books.
 
-[Khalil Stemmler](https://khalilstemmler.com/) - [solid](https://solidbook.io/)
-
+[Khalil Stemmler](https://khalilstemmler.com/) - [solid](https://solidbook.io/)<br/>
 [Alex Lawrence](https://www.alex-lawrence.com/) - [Implementing DDD, CQRS and Event Sourcing](https://www.alex-lawrence.com/book/)
 
