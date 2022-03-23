@@ -1,0 +1,16 @@
+{
+  "name": "@ddd/modules",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@eventstore/db-client": "^3.1.0",
+    "amqplib": "^0.8.0",
+    "argon2": "^0.28.4",
+    "ioredis": "^4.28.5",
+    "ulid": "^2.3.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^2.6.2"
+  }
+}

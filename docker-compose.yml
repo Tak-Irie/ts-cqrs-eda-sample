@@ -1,0 +1,44 @@
+version: '3.9'
+services:
+  redis:
+    image: redis:6.2.6
+    ports:
+      - 6380:6379
+    restart: always
+    volumes:
+      - ./redis/data:/data
+      - ./redis/redis.conf:/redis.conf
+    command: [ 'redis-server', '/redis.conf' ]
+  eventstore:
+    image: eventstore/eventstore:21.10.2-bionic
+    environment:
+      - EVENTSTORE_CLUSTER_SIZE=1
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+      - EVENTSTORE_EXT_TCP_PORT=1113
+      - EVENTSTORE_HTTP_PORT=2113
+      - EVENTSTORE_INSECURE=true
+      - EVENTSTORE_ENABLE_EXTERNAL_TCP=true
+      - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+    ports:
+      - "1113:1113"
+      - "2113:2113"
+    volumes:
+      - type: volume
+        source: eventstore-volume-data
+        target: /var/lib/eventstore
+      - type: volume
+        source: eventstore-volume-logs
+        target: /var/log/eventstore
+  rabbitmq:
+    image: rabbitmq:3.9.13-management
+    hostname: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+volumes:
+  eventstore-volume-data:
+  eventstore-volume-logs:
+  rabbitmq-data:

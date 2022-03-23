@@ -1,3 +1,8 @@
+# added by myself
+rabbitmq
+redis
+
+# added automatically bellow
 # Logs
 logs
 *.log

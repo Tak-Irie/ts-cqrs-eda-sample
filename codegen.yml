@@ -1,0 +1,19 @@
+schema: ./modules/shared/infrastructure/graphql/*.graphql
+generates:
+  ./apps/server/src/graphql/generated/resolversTypes.ts:
+    config:
+      useIndexSignature: true
+    plugins:
+      - typescript
+      - typescript-resolvers
+  ./apps/web/src/generated/graphql.ts:
+    documents: "./apps/web/src/graphql/**/*.graphql"
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+    config:
+      withHooks: true
+  ./apps/server/src/graphql/generated/schema.graphql:
+    plugins:
+      - schema-ast
