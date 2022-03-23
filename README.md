@@ -28,8 +28,8 @@ And then you can convert express to a proxy or remove.
 ## Special Thanks
 
 I have learned much about DDD in their books.
-[Khalil Stemmler](https://khalilstemmler.com/)
-  [solid](https://solidbook.io/)
-[Alex Lawrence](https://www.alex-lawrence.com/)
-  [Implementing DDD, CQRS and Event Sourcing](https://www.alex-lawrence.com/book/)
+
+[Khalil Stemmler](https://khalilstemmler.com/) - [solid](https://solidbook.io/)
+
+[Alex Lawrence](https://www.alex-lawrence.com/) - [Implementing DDD, CQRS and Event Sourcing](https://www.alex-lawrence.com/book/)
 
