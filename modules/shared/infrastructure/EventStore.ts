@@ -5,7 +5,7 @@ type Args = {
 };
 
 export abstract class EventStore {
-  async save(some: any): Promise<any> {
+  async save(some: Args): Promise<unknown> {
     const result = await "some";
     return result;
   }

@@ -19,6 +19,9 @@ import {
   eventTypeFilter,
   ResolvedEvent,
   RecordedEvent,
+  ReadStreamOptions,
+  EventTypeToRecordedEvent,
+  SubscribeToStreamOptions,
 } from "@eventstore/db-client";
 
 import { EventStore } from "../EventStore";
@@ -26,17 +29,8 @@ import { StreamVersionMismatchError } from "../StreamVersionMismatchError";
 import { AsyncQueue } from "../../domain/AsyncQueue";
 import { Event, EventType } from "../../domain";
 import { JSONType } from "../../util/SharedTypes";
-
-type SaveArgs<T extends JSONEventType> = {
-  streamID: string;
-  event: EventData<T>;
-  expectedRevision: AppendExpectedRevision;
-};
-
-type LoadArgs = {
-  streamID: string;
-  startVersion: number;
-};
+import { ReadSyncOptions } from "fs";
+import { ReadableOptions } from "stream";
 
 type SubscribeArgs = {
   streamID: string;
@@ -44,31 +38,28 @@ type SubscribeArgs = {
   startVersion: ReadRevision;
 };
 
-type SubscribeToAllArgs = {
-  callback: (event: AllStreamRecordedEvent) => void;
-  typeNameFilters: string[];
-  fromPosition: ReadPosition;
-};
+type Callback<EVENT> = (event: EVENT) => void;
+// type Numbered<T> = T & { number: number };
 
-export class EventStoreDB extends EventStore {
+export class EventStoreDB<EVENT extends EventType> {
   private client: EventStoreDBClient;
   constructor(uri: string) {
-    super();
     this.client = EventStoreDBClient.connectionString(uri);
   }
 
-  async save<T extends JSONEventType>(
-    args: SaveArgs<T>
+  async save(
+    streamID: string,
+    event: EventData<EVENT>,
+    expectedRevision: "stream_exists" | "no_stream" | "any" | bigint
   ): Promise<AppendResult> {
     try {
       // console.log("db-args:", args);
-      const { event, streamID } = args;
 
-      let expectedRevision = args.expectedRevision;
-      if (expectedRevision === null) expectedRevision = NO_STREAM;
+      let _expectedRevision = expectedRevision;
+      if (expectedRevision === null) _expectedRevision = NO_STREAM;
 
       const response = await this.client.appendToStream(streamID, event, {
-        expectedRevision,
+        expectedRevision: _expectedRevision,
       });
       console.log("res:", response);
       if (!response.success)
@@ -84,48 +75,79 @@ export class EventStoreDB extends EventStore {
     }
   }
 
-  // async load(args: LoadArgs) {
-  //   try {
-  //     const { startVersion, streamID } = args;
+  async load(
+    streamId: string,
+    options?: ReadStreamOptions,
+    readableOptions?: ReadableOptions
+  ) {
+    try {
+      const events = this.client.readStream<EVENT>(
+        streamId,
+        options,
+        readableOptions
+      );
+      let eventData: EventTypeToRecordedEvent<EVENT>[] = [];
+      for await (const resolvedEvent of events) {
+        if (resolvedEvent.event) {
+          eventData.push(resolvedEvent.event);
+        }
+      }
 
-  //     const fromRevision = BigInt(startVersion);
-  //     const events = this.client.readStream<SomeEvent>(streamID, {
-  //       fromRevision,
-  //     });
+      return {
+        eventData,
+        currentVersion:
+          eventData !== undefined && eventData.length > 0
+            ? eventData[eventData.length - 1].revision
+            : null,
+      };
+    } catch (error) {
+      if (!(error instanceof StreamNotFoundError)) throw error;
+      return { events: [], currentVersion: null };
+    }
+  }
 
-  //     return {
-  //       events,
-  //       currentVersion:
-  //         events.length > 0 ? events[events.length - 1].revision : null,
-  //     };
-  //   } catch (error) {
-  //     if (!(error instanceof StreamNotFoundError)) throw error;
-  //     return { events: [], currentVersion: null };
-  //   }
-  // }
-
-  async subscribe(args: SubscribeArgs) {
-    const { callback, startVersion, streamID } = args;
+  async subscribe(
+    callback: Callback<EVENT>,
+    streamId: string,
+    options: SubscribeToStreamOptions
+  ) {
     const callbackExecutionQueue = new AsyncQueue();
-    const subscription = this.client.subscribeToStream(streamID, {
-      fromRevision: startVersion,
-    });
+    const subscription = this.client.subscribeToStream<EVENT>(
+      streamId,
+      options
+    );
     subscription.on("data", ({ event }) => {
       if (!event) return;
-      callbackExecutionQueue.enqueueOperation(() => callback(event));
+      const { data, type, metadata } = event;
+      const _event = {
+        type,
+        data,
+        metadata,
+      } as EVENT;
+      callbackExecutionQueue.enqueueOperation(() => callback(_event));
     });
   }
 
-  async subscribeToAll(args: SubscribeToAllArgs) {
-    const { callback, fromPosition, typeNameFilters } = args;
+  async subscribeToAll(
+    callback: Callback<EVENT>,
+    typeNameFilters: string[],
+    fromPosition: ReadPosition
+  ) {
     const callbackExecutionQueue = new AsyncQueue();
     const subscription = this.client.subscribeToAll({
       fromPosition,
       filter: eventTypeFilter({ prefixes: typeNameFilters }),
     });
     subscription.on("data", ({ event }) => {
-      if (!event) return;
-      callbackExecutionQueue.enqueueOperation(() => callback(event));
+      if (event === undefined || event.metadata === undefined || !event.isJson)
+        return;
+      const { data, type, metadata } = event;
+      const _event = {
+        type,
+        data,
+        metadata,
+      } as EVENT;
+      callbackExecutionQueue.enqueueOperation(() => callback(_event));
     });
   }
 }

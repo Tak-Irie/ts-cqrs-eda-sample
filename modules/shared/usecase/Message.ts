@@ -1,4 +1,4 @@
-import { generateID } from "../util/generateID";
+import { generateId } from "../util/generateId";
 import { JSONType } from "../util/SharedTypes";
 
 type MetadataType = JSONType | Uint8Array;
@@ -12,7 +12,7 @@ type MessageType = {
 class Message {
   readonly typeName: string;
   readonly data: JSONType;
-  readonly id = generateID();
+  readonly id = generateId();
   readonly metadata: MetadataType;
 
   constructor(typeName: string, data: JSONType, metadata: MetadataType) {

@@ -1,5 +1,5 @@
 import { ulid } from "ulid";
 
-export const generateID = () => {
+export const generateId = () => {
   return ulid();
 };

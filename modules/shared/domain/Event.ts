@@ -1,33 +1,52 @@
-import { generateID } from "../util/generateID";
+import { generateId } from "../util/generateId";
 import { JSONType } from "../util/SharedTypes";
 
 type MetadataType = JSONType | Uint8Array;
 
-type EventType<T extends string, U extends JSONType> = {
-  type: T;
-  data: U;
+type EventType<
+  TYPENAME extends string = string,
+  DATA extends JSONType = JSONType
+> = {
+  type: TYPENAME;
+  data: DATA;
   metadata: MetadataType;
 };
 
-class Event<T extends string, U extends JSONType> {
-  readonly type: T;
-  readonly data: U;
-  readonly id = generateID();
+class Event<TYPENAME extends string, DATA extends JSONType> {
+  readonly type: TYPENAME;
+  readonly data: DATA;
+  readonly id = generateId();
   readonly metadata: MetadataType;
 
-  constructor(type: T, data: U, metadata: MetadataType) {
+  private constructor(type: TYPENAME, data: DATA, metadata: MetadataType) {
     this.type = type;
     this.data = data;
     this.metadata = metadata;
   }
 
-  static createEvent<T extends string, U extends JSONType>(
-    event: EventType<T, U>
-  ): Event<T, U> {
-    const { data, metadata, type } = event;
-    return new Event<T, U>(type, data, metadata);
+  static createEvent<DATA extends JSONType, TYPENAME extends string>(
+    type: TYPENAME,
+    metadata?: MetadataType
+  ) {
+    const _metadata = { metadata, created: Date.now() };
+    return (data: DATA) => {
+      return new Event<TYPENAME, DATA>(type, data, _metadata);
+    };
   }
 }
 
-export { Event };
+const createEvent =
+  <TypeName extends string>(type: TypeName) =>
+  <Data>() => {
+    return class Event {
+      static readonly type: TypeName = type;
+      readonly type = type;
+      readonly id = generateId();
+      readonly metadata = {};
+
+      constructor(readonly data: Data) {}
+    };
+  };
+
+export { Event, createEvent };
 export type { EventType };

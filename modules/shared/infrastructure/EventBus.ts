@@ -1,23 +1,31 @@
 import MessageBus from "./MessageBus";
 
-type Subscriber<T, U> = (event: Extract<T, { type: U }>) => any;
+type Subscriber<EVENT, TYPENAME> = (
+  event: Extract<EVENT, { type: TYPENAME }>
+) => any;
 
-export class EventBus<T extends { type: string }> {
+export class EventBus<EVENT extends { type: string }> {
   private messageBus;
 
   constructor(messageBus: Omit<MessageBus, ""> = new MessageBus()) {
     this.messageBus = messageBus;
   }
 
-  subscribe<U extends string>(eventType: U, subscriber: Subscriber<T, U>) {
+  subscribe<TYPENAME extends string>(
+    eventType: TYPENAME,
+    subscriber: Subscriber<EVENT, TYPENAME>
+  ) {
     this.messageBus.subscribe(eventType, subscriber);
   }
 
-  unsubscribe<U extends string>(eventType: U, subscriber: Subscriber<T, U>) {
+  unsubscribe<TYPENAME extends string>(
+    eventType: TYPENAME,
+    subscriber: Subscriber<EVENT, TYPENAME>
+  ) {
     this.messageBus.unsubscribe(eventType, subscriber);
   }
 
-  publish(event: T) {
+  publish(event: EVENT) {
     return this.messageBus.publish(event.type, event);
   }
 }
