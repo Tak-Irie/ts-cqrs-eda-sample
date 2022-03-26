@@ -15,6 +15,9 @@ messageBroker: RabbitMQ<br/>
 API: Apollo(GraphQL)<br/>
 others: yarnWorkspace, DockerCompose<br/>
 
+## Architecture Image
+
+![](images/architecture.png)
 ## Notice
 
 This application is written to learn DDD.
