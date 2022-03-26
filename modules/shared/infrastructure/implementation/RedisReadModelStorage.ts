@@ -7,9 +7,9 @@ export class RedisReadModelStorage implements ReadModelStorage {
   private dataType;
   private indexes;
 
-  constructor(host: string, dataType: string, indexes: string[]) {
-    this.client = new Redis(host);
-    this.subscribeClient = new Redis(host);
+  constructor(uri: string, dataType: string, indexes: string[]) {
+    this.client = new Redis(uri);
+    this.subscribeClient = new Redis(uri);
     this.dataType = dataType;
     this.indexes = indexes;
   }
