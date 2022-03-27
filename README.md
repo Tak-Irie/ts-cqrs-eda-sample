@@ -15,6 +15,9 @@ messageBroker: RabbitMQ<br/>
 API: Apollo(GraphQL)<br/>
 others: yarnWorkspace, DockerCompose<br/>
 
+## Architecture Image
+
+![](images/architecture.png)
 ## Notice
 
 This application is written to learn DDD.
@@ -31,4 +34,13 @@ I have learned much about DDD in their books.
 
 [Khalil Stemmler](https://khalilstemmler.com/) - [solid](https://solidbook.io/)<br/>
 [Alex Lawrence](https://www.alex-lawrence.com/) - [Implementing DDD, CQRS and Event Sourcing](https://www.alex-lawrence.com/book/)
+
+## Special Thanks, For Japanese
+
+日本語ソースでは以下の方々が非常に参考になります。
+
+
+かとじゅんさん - [かとじゅんの技術日誌](https://blog.j5ik2o.me/)<br/>
+松岡さん - [little hand's lab](https://little-hands.hatenablog.com/) - [books](https://little-hands.booth.pm/)<br/>
+成瀬さん - [book](https://www.amazon.co.jp/dp/B082WXZVPC/)
 
