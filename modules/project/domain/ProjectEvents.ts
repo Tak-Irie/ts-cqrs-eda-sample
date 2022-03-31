@@ -1,62 +1,85 @@
-import { createEvent } from "../../shared/domain";
+import { useEventFactory } from "modules/shared/domain/_Event";
 
-const ProjectCreatedEvent = createEvent("ProjectCreated")<{
-  projectId: string;
-  name: string;
-  ownerId: string;
-  teamId: string;
-  taskBoardId: string;
-}>();
-const ProjectRenamedEvent =
-  createEvent("ProjectRenamed")<{ projectId: string; name: string }>();
-const TeamMemberCreatedEvent = createEvent("TeamMemberCreated")<{
-  teamMemberId: string;
-  userId: string;
-  role: string;
-}>();
-const TeamMemberRoleChangedEvent = createEvent("TeamMemberRoleChanged")<{
-  teamMemberId: string;
-  role: string;
-}>();
-const TeamCreatedEvent = createEvent("TeamCreated")<{ teamId: string }>();
-const TeamMemberAddedToTeamEvent = createEvent("TeamMemberAddedToTeam")<{
-  teamId: string;
-  teamMemberId: string;
-}>();
-const TeamMemberRemovedFromTeamEvent = createEvent(
-  "TeamMemberRemovedFromTeam"
-)<{ teamId: string; teamMemberId: string }>();
+const createProjectCreated = useEventFactory<
+  "ProjectCreated",
+  {
+    projectId: string;
+    name: string;
+    ownerId: string;
+    teamId: string;
+    taskBoardId: string;
+  }
+>({ type: "ProjectCreated" });
 
-type ProjectCreatedEvent = InstanceType<typeof ProjectCreatedEvent>;
-type ProjectRenamedEvent = InstanceType<typeof ProjectRenamedEvent>;
-type TeamMemberCreatedEvent = InstanceType<typeof TeamMemberCreatedEvent>;
-type TeamMemberRoleChangedEvent = InstanceType<
-  typeof TeamMemberRoleChangedEvent
+const createProjectRenamed = useEventFactory<
+  "ProjectRenamed",
+  { projectId: string; name: string }
+>({ type: "ProjectRenamed" });
+
+const createTeamMemberCreated = useEventFactory<
+  "TeamMemberCreated",
+  {
+    teamMemberId: string;
+    userId: string;
+    role: string;
+  }
+>({ type: "TeamMemberCreated" });
+
+const createTeamMemberRoleChanged = useEventFactory<
+  "TeamMemberRoleChanged",
+  {
+    teamMemberId: string;
+    role: string;
+  }
+>({ type: "TeamMemberRoleChanged" });
+
+const createTeamCreated = useEventFactory<"TeamCreated", { teamId: string }>({
+  type: "TeamCreated",
+});
+
+const createTeamMemberAddedToTeam = useEventFactory<
+  "TeamMemberAddedToTeam",
+  {
+    teamId: string;
+    teamMemberId: string;
+  }
+>({ type: "TeamMemberAddedToTeam" });
+
+const createTeamMemberRemovedFromTeam = useEventFactory<
+  "TeamMemberRemovedFromTeam",
+  { teamId: string; teamMemberId: string }
+>({ type: "TeamMemberRemovedFromTeam" });
+
+export type ProjectCreated = ReturnType<typeof createProjectCreated>;
+export type ProjectRenamed = ReturnType<typeof createProjectRenamed>;
+export type TeamMemberCreated = ReturnType<typeof createTeamMemberCreated>;
+export type TeamMemberRoleChanged = ReturnType<
+  typeof createTeamMemberRoleChanged
 >;
-type TeamCreatedEvent = InstanceType<typeof TeamCreatedEvent>;
-type TeamMemberAddedToTeamEvent = InstanceType<
-  typeof TeamMemberAddedToTeamEvent
+export type TeamCreated = ReturnType<typeof createTeamCreated>;
+export type TeamMemberAddedToTeam = ReturnType<
+  typeof createTeamMemberAddedToTeam
 >;
-type TeamMemberRemovedFromTeamEvent = InstanceType<
-  typeof TeamMemberRemovedFromTeamEvent
+export type TeamMemberRemovedFromTeam = ReturnType<
+  typeof createTeamMemberRemovedFromTeam
 >;
 
 type ProjectEvents =
-  | ProjectCreatedEvent
-  | ProjectRenamedEvent
-  | TeamMemberCreatedEvent
-  | TeamMemberAddedToTeamEvent
-  | TeamMemberRoleChangedEvent
-  | TeamCreatedEvent
-  | TeamMemberRemovedFromTeamEvent;
+  | ProjectCreated
+  | ProjectRenamed
+  | TeamMemberCreated
+  | TeamMemberAddedToTeam
+  | TeamMemberRoleChanged
+  | TeamCreated
+  | TeamMemberRemovedFromTeam;
 
 export {
   ProjectEvents,
-  ProjectCreatedEvent,
-  ProjectRenamedEvent,
-  TeamMemberCreatedEvent,
-  TeamMemberRoleChangedEvent,
-  TeamCreatedEvent,
-  TeamMemberAddedToTeamEvent,
-  TeamMemberRemovedFromTeamEvent,
+  createProjectCreated,
+  createProjectRenamed,
+  createTeamCreated,
+  createTeamMemberAddedToTeam,
+  createTeamMemberCreated,
+  createTeamMemberRemovedFromTeam,
+  createTeamMemberRoleChanged,
 };

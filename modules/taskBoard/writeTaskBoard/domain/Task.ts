@@ -1,11 +1,11 @@
 import { verify } from "../../../shared/util/verify";
 import {
   TaskBoardEvents,
-  TaskCreatedEvent,
-  TaskTitleChangedEvent,
-  TaskDescriptionChangedEvent,
-  TaskAssigneeChangedEvent,
-  TaskStatusChangedEvent,
+  createTaskAssigneeChanged,
+  createTaskStatusChanged,
+  createTaskDescriptionChanged,
+  createTaskTitleChanged,
+  createTaskCreated,
 } from "../../domain/TaskBoardEvents";
 
 type State = { id?: string; status?: string; assigneeId?: string };
@@ -16,15 +16,15 @@ const applyTaskEvents = (state: State, events: TaskBoardEvents[]) =>
   events.reduce(applyEvent, state);
 
 const applyEvent = (state: State, event: TaskBoardEvents) => {
-  if (event.type === TaskCreatedEvent.type)
+  if (event.type === "TaskCreated")
     return {
       ...state,
       id: event.data.taskId,
       assigneeId: event.data.assigneeId,
     };
-  if (event.type === TaskStatusChangedEvent.type)
+  if (event.type === "TaskStatusChanged")
     return { ...state, status: event.data.status };
-  if (event.type === TaskAssigneeChangedEvent.type)
+  if (event.type === "TaskAssigneeChanged")
     return { ...state, assigneeId: event.data.assigneeId };
   return { ...state };
 };
@@ -46,7 +46,7 @@ const createTask = ({
   verify("valid status", validStatus.includes(status));
   verify("active task assignee", status !== "in progress" || !!assigneeId);
   return [
-    new TaskCreatedEvent({
+    createTaskCreated({
       taskId: id,
       title,
       description,
@@ -58,11 +58,11 @@ const createTask = ({
 
 const updateTitle = (state: State, title: string) => {
   verify("valid title", !!title);
-  return [new TaskTitleChangedEvent({ taskId: state.id!, title })];
+  return [createTaskTitleChanged({ taskId: state.id!, title })];
 };
 
 const updateDescription = (state: State, description: string) => [
-  new TaskDescriptionChangedEvent({ taskId: state.id!, description }),
+  createTaskDescriptionChanged({ taskId: state.id!, description }),
 ];
 
 const updateStatus = (state: State, status: string) => {
@@ -71,7 +71,7 @@ const updateStatus = (state: State, status: string) => {
     "active task assignee",
     status !== "in progress" || !!state.assigneeId
   );
-  return [new TaskStatusChangedEvent({ taskId: state.id!, status })];
+  return [createTaskStatusChanged({ taskId: state.id!, status })];
 };
 
 const updateAssignee = (state: State, assigneeId?: string) => {
@@ -80,7 +80,7 @@ const updateAssignee = (state: State, assigneeId?: string) => {
     state.status !== "in progress" || !!assigneeId
   );
   if (!assigneeId) assigneeId = "NOTHING";
-  return [new TaskAssigneeChangedEvent({ taskId: state.id!, assigneeId })];
+  return [createTaskAssigneeChanged({ taskId: state.id!, assigneeId })];
 };
 
 export {

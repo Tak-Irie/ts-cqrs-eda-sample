@@ -1,75 +1,102 @@
-import { createEvent } from "../../shared/domain/Event";
+import { useEventFactory } from "modules/shared/domain/_Event";
 
-const TaskCreatedEventClass = createEvent("TaskCreated")<{
-  taskId: string;
-  title: string;
-  description: string;
-  status: string;
-  assigneeId: string;
-}>();
+const createTaskCreated = useEventFactory<
+  "TaskCreated",
+  {
+    taskId: string;
+    title: string;
+    description: string;
+    status: string;
+    assigneeId: string;
+  }
+>({ type: "TaskCreated" });
 
-const TaskAssigneeChangedEvent = createEvent("TaskAssigneeChanged")<{
-  taskId: string;
-  assigneeId: string;
-}>();
+const createTaskAssigneeChanged = useEventFactory<
+  "TaskAssigneeChanged",
+  {
+    taskId: string;
+    assigneeId: string;
+  }
+>({ type: "TaskAssigneeChanged" });
 
-const TaskTitleChangedEvent = createEvent("TaskTitleChanged")<{
-  taskId: string;
-  title: string;
-}>();
+const createTaskTitleChanged = useEventFactory<
+  "TaskTitleChanged",
+  {
+    taskId: string;
+    title: string;
+  }
+>({ type: "TaskTitleChanged" });
 
-const TaskDescriptionChangedEvent = createEvent("TaskDescriptionChanged")<{
-  taskId: string;
-  description: string;
-}>();
+const createTaskDescriptionChanged = useEventFactory<
+  "TaskDescriptionChanged",
+  {
+    taskId: string;
+    description: string;
+  }
+>({ type: "TaskDescriptionChanged" });
 
-const TaskStatusChangedEvent = createEvent("TaskStatusChanged")<{
-  taskId: string;
-  status: string;
-}>();
+const createTaskStatusChanged = useEventFactory<
+  "TaskStatusChanged",
+  {
+    taskId: string;
+    status: string;
+  }
+>({ type: "TaskStatusChanged" });
 
-const TaskBoardCreatedEventClass = createEvent("TaskBoardCreated")<{
-  taskBoardId: string;
-}>();
-const TaskAddedToTaskBoardEvent = createEvent("TaskAddedToTaskBoard")<{
-  taskBoardId: string;
-  taskId: string;
-}>();
-const TaskRemovedFromTaskBoardEvent = createEvent("TaskRemovedFromTaskBoard")<{
-  taskBoardId: string;
-  taskId: string;
-}>();
+const createTaskBoardCreated = useEventFactory<
+  "TaskBoardCreated",
+  {
+    taskBoardId: string;
+  }
+>({ type: "TaskBoardCreated" });
+const createTaskAddedToTaskBoard = useEventFactory<
+  "TaskAddedToTaskBoard",
+  {
+    taskBoardId: string;
+    taskId: string;
+  }
+>({ type: "TaskAddedToTaskBoard" });
+const createTaskRemovedFromTaskBoard = useEventFactory<
+  "TaskRemovedFromTaskBoard",
+  {
+    taskBoardId: string;
+    taskId: string;
+  }
+>({ type: "TaskRemovedFromTaskBoard" });
 
-type TaskCreatedEvent = InstanceType<typeof TaskCreatedEventClass>;
-type TaskAssigneeChangedEvent = InstanceType<typeof TaskAssigneeChangedEvent>;
-type TaskTitleChangedEvent = InstanceType<typeof TaskTitleChangedEvent>;
-type TaskDescriptionChangedEvent = InstanceType<
-  typeof TaskDescriptionChangedEvent
+export type TaskCreated = ReturnType<typeof createTaskCreated>;
+export type TaskAssigneeChanged = ReturnType<typeof createTaskAssigneeChanged>;
+export type TaskTitleChanged = ReturnType<typeof createTaskTitleChanged>;
+export type TaskDescriptionChanged = ReturnType<
+  typeof createTaskDescriptionChanged
 >;
-type TaskStatusChangedEvent = InstanceType<typeof TaskStatusChangedEvent>;
-type TaskBoardCreatedEvent = InstanceType<typeof TaskBoardCreatedEventClass>;
-type TaskAddedToTaskBoardEvent = InstanceType<typeof TaskAddedToTaskBoardEvent>;
-type TaskRemovedFromTaskBoardEvent = InstanceType<
-  typeof TaskRemovedFromTaskBoardEvent
+export type TaskStatusChanged = ReturnType<typeof createTaskStatusChanged>;
+export type TaskBoardCreated = ReturnType<typeof createTaskBoardCreated>;
+export type TaskAddedToTaskBoard = ReturnType<
+  typeof createTaskAddedToTaskBoard
 >;
+export type TaskRemovedFromTaskBoard = ReturnType<
+  typeof createTaskRemovedFromTaskBoard
+>;
+
 type TaskBoardEvents =
-  | TaskCreatedEvent
-  | TaskAssigneeChangedEvent
-  | TaskTitleChangedEvent
-  | TaskDescriptionChangedEvent
-  | TaskStatusChangedEvent
-  | TaskBoardCreatedEvent
-  | TaskAddedToTaskBoardEvent
-  | TaskRemovedFromTaskBoardEvent;
+  | TaskCreated
+  | TaskAssigneeChanged
+  | TaskTitleChanged
+  | TaskDescriptionChanged
+  | TaskStatusChanged
+  | TaskBoardCreated
+  | TaskAddedToTaskBoard
+  | TaskRemovedFromTaskBoard;
 
 export {
   TaskBoardEvents,
-  TaskCreatedEventClass,
-  TaskTitleChangedEvent,
-  TaskAssigneeChangedEvent,
-  TaskRemovedFromTaskBoardEvent,
-  TaskAddedToTaskBoardEvent,
-  TaskBoardCreatedEventClass,
-  TaskDescriptionChangedEvent,
-  TaskStatusChangedEvent,
+  createTaskAddedToTaskBoard,
+  createTaskAssigneeChanged,
+  createTaskBoardCreated,
+  createTaskCreated,
+  createTaskDescriptionChanged,
+  createTaskRemovedFromTaskBoard,
+  createTaskStatusChanged,
+  createTaskTitleChanged,
 };

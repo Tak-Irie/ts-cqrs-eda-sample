@@ -1,15 +1,36 @@
-import { EVENT_STORE_URI } from "../util/Constants";
-import { generateId } from "../util/generateId";
+import { generateUUIDv4 } from "../util/generateId";
+import { JSONType } from "../util/SharedTypes";
 
-export const createEventType =
-  <TypeName extends string>(type: TypeName) =>
-  <Data>() => {
-    return class Event {
-      static readonly type: TypeName = type;
-      readonly type = type;
-      readonly id = generateId();
-      readonly metadata = {};
+type MetadataType = {
+  [key: string]: string | number;
+};
 
-      constructor(readonly data: Data) {}
-    };
-  };
+type DataType = {
+  [key: string]: string | number;
+};
+
+type EventType<TYPE_NAME> = {
+  type: TYPE_NAME;
+  metadata?: MetadataType;
+};
+
+type EventData<TYPE_NAME = string, DATA = DataType> = {
+  id: string;
+  type: TYPE_NAME;
+  data: DATA;
+  metadata: MetadataType;
+};
+
+const useEventFactory = <TYPE_NAME extends string, DATA extends DataType>({
+  type,
+  metadata = { createdAt: Date.now() },
+}: EventType<TYPE_NAME>) => {
+  return (data: DATA): EventData<TYPE_NAME, DATA> => ({
+    id: generateUUIDv4(),
+    type,
+    data,
+    metadata,
+  });
+};
+
+export { useEventFactory, EventData };

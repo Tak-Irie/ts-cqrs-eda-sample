@@ -1,21 +1,21 @@
 import { EventType } from "../domain/Event";
 
 type Args = {
-  [key: string]: string;
+  [key: string]: unknown;
 };
 
-export abstract class EventStore {
-  async save(some: Args): Promise<unknown> {
+export abstract class EventStore<EVENT> {
+  async save(arg: Args): Promise<unknown> {
     const result = await "some";
     return result;
   }
-  load(some: any): any {
-    return some;
+  load(streamId: string): unknown {
+    return;
   }
-  subscribe(some: any): any {
-    return some;
+  subscribe(args: Args): unknown {
+    return;
   }
-  subscribeToAll(some: any): any {
-    return some;
+  subscribeToAll(args: Args): unknown {
+    return;
   }
 }

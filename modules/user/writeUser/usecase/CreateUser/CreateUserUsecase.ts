@@ -2,7 +2,7 @@ import { JSONType, JSONEventType, jsonEvent } from "@eventstore/db-client";
 import { Either, Result, right, left } from "../../../../shared/core/Result";
 import { EventStore } from "../../../../shared/infrastructure/EventStore";
 import { EventStoreDB } from "../../../../shared/infrastructure/implementation/EventStoreDB";
-import { Message, MessageType } from "../../../../shared/usecase/Message";
+import { Message, MessageType } from "../../../../shared/usecase/_Message";
 import { UseCase } from "../../../../shared/usecase/UseCase";
 import { EmailRegistry, User } from "../../domain";
 

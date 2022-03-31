@@ -1,4 +1,4 @@
-import { Message, MessageType } from "../../../shared/usecase/Message";
+import { Message, MessageType } from "../../../shared/usecase/_Message";
 
 
 type CreateUserArgs = {

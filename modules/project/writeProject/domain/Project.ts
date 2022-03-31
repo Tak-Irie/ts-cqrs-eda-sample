@@ -1,31 +1,35 @@
-import { Entity, Event, UniqueEntityID } from "../../../shared/domain";
 import {
-  ProjectCreatedData,
-  ProjectCreatedEvent,
+  createProjectCreated,
+  createProjectRenamed,
 } from "../../domain/ProjectEvents";
 
-type ProjectProps = {
+type State = { id?: string };
+
+const applyProjectEvents = (state: State, events: Event[]) =>
+  events.reduce(applyEvent, state);
+
+const applyEvent = (state: State, _: Event) => ({ ...state });
+
+const createProject = ({
+  id: projectId,
+  name,
+  ownerId,
+  teamId,
+  taskBoardId,
+}: {
   id: string;
   name: string;
   ownerId: string;
   teamId: string;
   taskBoardId: string;
+}) => {
+  return [
+    createProjectCreated({ projectId, name, ownerId, teamId, taskBoardId }),
+  ];
 };
 
-export class Project extends Entity<ProjectProps> {
-  private constructor(readonly props: ProjectProps, id?: UniqueEntityID) {
-    super(props, id);
-  }
-  static createProject(args: ProjectCreatedData) {
-    const event: ProjectCreatedEvent = {
-      type: "ProjectCreated",
-      data: {
-        ...args,
-        id: new UniqueEntityID().toString(),
-      },
-      metadata: { NONE: "NONE" },
-    };
+const renameProject = (state: State, name: string) => {
+  return [createProjectRenamed({ projectId: state.id!, name })];
+};
 
-    return event;
-  }
-}
+export { applyProjectEvents, createProject, renameProject };
