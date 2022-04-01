@@ -1,50 +1,70 @@
 import amqp from "amqplib";
 
+import { EventData } from "modules/shared/domain/_Event";
+import {
+  EventBus,
+  SubscribeArg,
+  Subscriber,
+  UnsubscribeArg,
+  PublishArg,
+} from "../EventBus";
 import { serializeJSON, deserializeJSON } from "../../util/json";
 
-export class RabbitMQBus {
-  private initialization;
-  private subscriberGroup;
-  private subscribersByTopic;
+type RabbitMQConstructor = {
+  uri: string;
+  subscriberGroup: string;
+};
 
-  constructor(connectionString: string, subscriberGroup = "default") {
+type ProcessMessage = {
+  message: amqp.ConsumeMessage;
+  channel: amqp.ConfirmChannel;
+};
+class RabbitMQBus<EVENT extends EventData> implements EventBus<EVENT> {
+  private subscriberGroup: string;
+  private subscribersByTopic: Map<string, Array<Subscriber<EVENT>>>;
+  private initialization;
+
+  constructor({ uri, subscriberGroup }: RabbitMQConstructor) {
     this.subscriberGroup = subscriberGroup;
     this.subscribersByTopic = new Map();
-    this.initialization = amqp
-      .connect(connectionString)
-      .then(async (connection) => {
-        const channel = await connection.createConfirmChannel();
-        channel.assertExchange("domain-events", "direct");
-        channel.assertQueue(this.subscriberGroup, { durable: true });
-        channel.consume(
-          this.subscriberGroup,
-          (message) => this.processMessage(message, channel),
-          { noAck: false }
-        );
-        return channel;
-      });
+    this.initialization = amqp.connect(uri).then(async (connection) => {
+      const channel = await connection.createConfirmChannel();
+      channel.assertExchange("domain-events", "direct");
+      channel.assertQueue(this.subscriberGroup, { durable: true });
+      channel.consume(
+        this.subscriberGroup,
+        (message) => {
+          if (message !== null) this.processMessage({ message, channel });
+        },
+        { noAck: false }
+      );
+      return channel;
+    });
   }
 
-  async subscribe(topic: any, subscriber: any) {
+  async subscribe({ eventType, subscriber }: SubscribeArg<EVENT>) {
     const channel = await this.initialization;
-    channel.bindQueue(this.subscriberGroup, "domain-events", topic);
-    const newSubscribers = this.getSubscribers(topic).concat([subscriber]);
-    this.subscribersByTopic.set(topic, newSubscribers);
+
+    channel.bindQueue(this.subscriberGroup, "domain-events", eventType);
+    const gotSubscribers = this.getSubscribers(eventType);
+    const concatSubscriber = gotSubscribers.concat([subscriber]);
+
+    this.subscribersByTopic.set(eventType, concatSubscriber);
   }
 
-  unsubscribe(topic: any, subscriber: any) {
-    const subscribers = this.getSubscribers(topic);
-    subscribers.splice(subscribers.indexOf(subscriber), 1);
-    this.subscribersByTopic.set(topic, subscribers);
+  async unsubscribe({ eventType, subscriber }: UnsubscribeArg<EVENT>) {
+    const gotSubscribers = this.getSubscribers(eventType);
+    gotSubscribers.splice(gotSubscribers.indexOf(subscriber), 1);
+    this.subscribersByTopic.set(eventType, gotSubscribers);
   }
 
-  async publish(topic: string, messageContent: any) {
+  async publish({ eventType, event }: PublishArg<EVENT>) {
     const channel = await this.initialization;
-    const json = serializeJSON(messageContent);
+    const json = serializeJSON(event);
     return new Promise<void>((resolve, reject) =>
       channel.publish(
         "domain-events",
-        topic,
+        eventType,
         Buffer.from(json),
         { persistent: true },
         (error) => (error ? reject(error) : resolve())
@@ -52,9 +72,10 @@ export class RabbitMQBus {
     );
   }
 
-  async processMessage(message: any, channel: any) {
+  async processMessage({ message, channel }: ProcessMessage) {
     const topic = message.fields.routingKey;
     const messageContent = deserializeJSON(message.content);
+
     await Promise.all(
       this.getSubscribers(topic).map(
         (subscriber: any) =>
@@ -68,7 +89,9 @@ export class RabbitMQBus {
     channel.ack(message);
   }
 
-  getSubscribers(topic: any) {
+  getSubscribers(topic: string) {
     return this.subscribersByTopic.get(topic) || [];
   }
 }
+
+export { RabbitMQBus };

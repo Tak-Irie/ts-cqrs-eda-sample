@@ -1,5 +1,4 @@
 import { _EventStoreDB } from "modules/shared/infrastructure/implementation/_EventStoreDB";
-import { EventBus } from "../../shared/infrastructure/EventBus";
 import { RabbitMQBus } from "../../shared/infrastructure/implementation/RabbitMQBus";
 import { RedisReadModelStorage } from "../../shared/infrastructure/implementation/RedisReadModelStorage";
 import {
@@ -8,27 +7,32 @@ import {
 } from "../../shared/util/Constants";
 import { TaskBoardEvents } from "../domain/TaskBoardEvents";
 import { TaskBoardCommandHandler } from "./usecase/TaskBoardCommandHandler";
+import {
+  TaskBoardEventHandler,
+  HandledEvent,
+} from "./usecase/TaskBoardEventHandler.ts";
 
-const eventStore = new _EventStoreDB<TaskBoardEvents>(EVENT_STORE_URI);
-const eventBus = new EventBus(new RabbitMQBus(MESSAGE_BROKER_URI, "taskBoard"));
+const useWriteTaskBoard = () => {
+  const eventStore = new _EventStoreDB<TaskBoardEvents>(EVENT_STORE_URI);
+  const taskBoardCommandHandler = new TaskBoardCommandHandler(eventStore);
 
-const taskAssigneeReadModelStorage = new RedisReadModelStorage({
-  uri: "task-board.redis",
-  dataType: "taskAssignee",
-  indexes: ["assigneeId"],
-});
+  const taskAssigneeReadModelStorage = new RedisReadModelStorage({
+    uri: "task-board.redis",
+    dataType: "taskAssignee",
+    indexes: ["assigneeId"],
+  });
 
-const taskBoardCommandHandler = new TaskBoardCommandHandler(eventStore);
-new TaskBoardDomainEventHandlers({
-  eventStore,
-  eventBus,
-  taskAssigneeReadModelStorage,
-}).activate();
+  const eventBus = new RabbitMQBus<HandledEvent>({
+    uri: MESSAGE_BROKER_URI,
+    subscriberGroup: "taskBoard",
+  });
+  new TaskBoardEventHandler({
+    eventStore,
+    eventBus,
+    taskAssigneeReadModelStorage,
+  }).activate();
 
-export { taskBoardCommandHandler };
+  return taskBoardCommandHandler;
+};
 
-// const httpInterface = createHttpInterface(
-//   (message) => commandHandlers.handleCommand(message),
-//   ["POST"]
-// );
-// http.createServer(httpInterface).listen(80);
+export { useWriteTaskBoard };

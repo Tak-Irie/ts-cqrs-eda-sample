@@ -1,9 +1,11 @@
-import Redis, { ValueType } from "ioredis";
+import Redis from "ioredis";
 import { ReadModelStorage } from "../ReadModelStorage";
 
 type UpdateArg = {
   id: string;
-  updates: any[];
+  updates: {
+    [key: string]: string | number;
+  };
 };
 
 type FindArgs = {

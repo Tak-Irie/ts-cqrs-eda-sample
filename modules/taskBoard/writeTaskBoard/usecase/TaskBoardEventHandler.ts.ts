@@ -1,19 +1,26 @@
-import { TeamMemberRemovedFromTeam } from "modules/project/domain/ProjectEvents";
+import {
+  ProjectCreated,
+  TeamMemberRemovedFromTeam,
+} from "modules/project/domain/ProjectEvents";
 import { EventBus } from "modules/shared/infrastructure/EventBus";
 import { _EventStoreDB } from "modules/shared/infrastructure/implementation/_EventStoreDB";
-import { ReadModelStorage } from "modules/shared/infrastructure/ReadModelStorage";
+import { RedisReadModelStorage } from "modules/shared/infrastructure/implementation/RedisReadModelStorage";
 import { TaskBoardEvents } from "modules/taskBoard/domain/TaskBoardEvents";
+import { createTaskBoard } from "../domain/TaskBoard";
+import { applyTaskEvents, updateAssignee, updateStatus } from "../domain/Task";
+
+export type HandledEvent = TeamMemberRemovedFromTeam | ProjectCreated;
 
 type Constructor = {
   eventStore: _EventStoreDB<TaskBoardEvents>;
-  eventBus: EventBus<TeamMemberRemovedFromTeam>;
-  taskAssigneeReadModelStorage: ReadModelStorage;
+  eventBus: EventBus<HandledEvent>;
+  taskAssigneeReadModelStorage: RedisReadModelStorage;
 };
 
 class TaskBoardEventHandler {
   private eventStore: _EventStoreDB<TaskBoardEvents>;
-  private eventBus: EventBus<TeamMemberRemovedFromTeam>;
-  private taskAssigneeReadModelStorage: ReadModelStorage;
+  private eventBus: EventBus<HandledEvent>;
+  private taskAssigneeReadModelStorage: RedisReadModelStorage;
 
   constructor({
     eventStore,
@@ -24,53 +31,78 @@ class TaskBoardEventHandler {
     this.eventBus = eventBus;
     this.taskAssigneeReadModelStorage = taskAssigneeReadModelStorage;
   }
-    activate = () => {
-      this.eventStore.subscribeToAll({
-        typeNameFilters:["TaskCreated","TaskAssigneeChanged"],
-        eventHandler:
-        async ( {data} ) => {
-
-          await this.taskAssigneeReadModelStorage.update(data.taskId, {
-            id: data.taskId,
-            assigneeId: data.assigneeId,
-          });
-      }
-
-      })
-      this.eventBus.subscribe(
-        "ProjectCreated",
-        async ({ data: { taskBoardId: id } }) => {
-          await this.eventStore.save(`task-board/${id}`, createTaskBoard(id), {
-            expectedVersion: null,
+  activate() {
+    this.eventStore.subscribeToAll({
+      typeNameFilters: ["TaskCreated", "TaskAssigneeChanged"],
+      eventHandler: async (event) => {
+        if (
+          event.type === "TaskCreated" ||
+          event.type === "TaskAssigneeChanged"
+        ) {
+          const { assigneeId, taskId } = event.data;
+          await this.taskAssigneeReadModelStorage.update({
+            id: taskId,
+            updates: {
+              id: taskId,
+              assigneeId: assigneeId,
+            },
           });
         }
-      );
-      this.eventBus.subscribe("TeamMemberRemovedFromTeam", async ({ data }) => {
-        const taskAssignees = await this.taskAssigneeReadModelStorage.findByIndex(
-          "assigneeId",
-          data.teamMemberId
-        );
-        await Promise.all(
-          taskAssignees.map(async ({ id }) => {
-            const { events, currentVersion } = await this.eventStore.load(
-              `task/${id}`
-            );
-            const taskState = applyTaskEvents({}, events);
-            const statusEvents =
-              taskState.status === "in progress"
-                ? updateStatus(taskState, "todo")
-                : [];
-            const updatedTaskState = applyTaskEvents(taskState, statusEvents);
-            const assigneeEvents = updateAssignee(updatedTaskState, undefined);
-            await this.eventStore.save(
-              `task/${id}`,
-              [...statusEvents, ...assigneeEvents],
-              { expectedVersion: currentVersion }
-            );
-          })
-        );
-      });
-    };
+      },
+    });
+    this.eventBus.subscribe({
+      eventType: "ProjectCreated",
+      subscriber: async (event) => {
+        if (event.type === "ProjectCreated") {
+          const { taskBoardId } = event.data;
+          await this.eventStore.save({
+            streamId: `task-board/${taskBoardId}`,
+            event: createTaskBoard(taskBoardId),
+            expectedRevision: "no_stream",
+          });
+        }
+      },
+    });
+
+    this.eventBus.subscribe({
+      eventType: "TeamMemberRemovedFromTeam",
+      subscriber: async (event) => {
+        if (event.type === "TeamMemberRemovedFromTeam") {
+          const { teamMemberId } = event.data;
+          const taskAssignees =
+            await this.taskAssigneeReadModelStorage.findByIndex({
+              index: "assigneeId",
+              indexValue: teamMemberId,
+            });
+
+          await Promise.all(
+            taskAssignees.map(async ({ id }) => {
+              const result = await this.eventStore.load(`task/${id}`);
+              if (result === false) return false;
+              const { events, currentVersion } = result;
+              const taskState = applyTaskEvents({}, events);
+
+              const statusEvents =
+                taskState.status === "in progress"
+                  ? updateStatus(taskState, "todo")
+                  : [];
+
+              const updatedTaskState = applyTaskEvents(taskState, statusEvents);
+              const assigneeEvents = updateAssignee(
+                updatedTaskState,
+                undefined
+              );
+
+              await this.eventStore.save({
+                streamId: `task/${id}`,
+                event: [...statusEvents, ...assigneeEvents],
+                expectedRevision: currentVersion,
+              });
+            })
+          );
+        }
+      },
+    });
   }
 }
 

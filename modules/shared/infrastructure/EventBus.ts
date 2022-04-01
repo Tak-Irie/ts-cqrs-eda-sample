@@ -1,31 +1,34 @@
-import MessageBus from "./MessageBus";
+import { EventData } from "../domain/_Event";
 
-type Subscriber<EVENT, TYPENAME> = (
-  event: Extract<EVENT, { type: TYPENAME }>
-) => any;
+type Subscriber<EVENT extends EventData> = (event: EVENT) => void;
 
-export class EventBus<EVENT extends { type: string }> {
-  private messageBus;
+type SubscribeArg<EVENT extends EventData> = {
+  eventType: EVENT["type"];
+  subscriber: Subscriber<EVENT>;
+};
 
-  constructor(messageBus: Omit<MessageBus, ""> = new MessageBus()) {
-    this.messageBus = messageBus;
-  }
+type UnsubscribeArg<EVENT extends EventData> = {
+  eventType: EVENT["type"];
+  subscriber: Subscriber<EVENT>;
+};
 
-  subscribe<TYPENAME extends string>(
-    eventType: TYPENAME,
-    subscriber: Subscriber<EVENT, TYPENAME>
-  ) {
-    this.messageBus.subscribe(eventType, subscriber);
-  }
+type PublishArg<EVENT extends EventData> = {
+  eventType: EVENT["type"];
+  event: EVENT;
+};
 
-  unsubscribe<TYPENAME extends string>(
-    eventType: TYPENAME,
-    subscriber: Subscriber<EVENT, TYPENAME>
-  ) {
-    this.messageBus.unsubscribe(eventType, subscriber);
-  }
-
-  publish(event: EVENT) {
-    return this.messageBus.publish(event.type, event);
+abstract class EventBus<EVENT extends EventData> {
+  async subscribe({
+    eventType,
+    subscriber,
+  }: SubscribeArg<EVENT>): Promise<void> {}
+  async unsubscribe({
+    eventType,
+    subscriber,
+  }: UnsubscribeArg<EVENT>): Promise<void> {}
+  async publish({ eventType, event }: PublishArg<EVENT>): Promise<unknown> {
+    return;
   }
 }
+
+export { EventBus, SubscribeArg, UnsubscribeArg, PublishArg, Subscriber };
