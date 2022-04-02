@@ -1,5 +1,8 @@
 type UpdateArgs = {
-  [key: string]: unknown;
+  id: string;
+  updates: {
+    [key: string]: unknown;
+  };
 };
 
 type LoadArgs = {
@@ -13,7 +16,7 @@ type FindArgs = {
 
 type SubscribeArgs = {
   topic: string;
-  callback: () => void;
+  callback: (arg: any) => void;
 };
 
 type PublishArgs = {
@@ -22,19 +25,25 @@ type PublishArgs = {
 };
 export abstract class ReadModelStorage {
   constructor() {}
-  async update({}: UpdateArgs): Promise<unknown> {
+  async update({ id, updates }: UpdateArgs): Promise<unknown> {
     return;
   }
-  async load({}: LoadArgs): Promise<unknown> {
+  async load({ id }: LoadArgs): Promise<unknown> {
     return;
   }
-  async findByIndex({}: FindArgs): Promise<unknown> {
+  async findByIndex({ index }: FindArgs): Promise<unknown> {
     return;
   }
-  async subscribeToChanges({}: SubscribeArgs): Promise<unknown> {
+  async subscribeToChanges({
+    topic,
+    callback,
+  }: SubscribeArgs): Promise<unknown> {
     return;
   }
-  async publishChangeMessage({}: PublishArgs): Promise<unknown> {
+  async publishChangeMessage({
+    topic,
+    message,
+  }: PublishArgs): Promise<unknown> {
     return;
   }
 }

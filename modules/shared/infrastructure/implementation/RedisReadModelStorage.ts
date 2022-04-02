@@ -1,10 +1,16 @@
 import Redis from "ioredis";
 import { ReadModelStorage } from "../ReadModelStorage";
 
+type RedisConstructorArg = {
+  uri: string;
+  dataType: string;
+  indexes: string[];
+};
+
 type UpdateArg = {
   id: string;
   updates: {
-    [key: string]: string | number;
+    [key: string]: string;
   };
 };
 
@@ -20,7 +26,9 @@ type SubscribeArgs = {
 
 type PublishArgs = {
   topic: string;
-  message: any;
+  message: {
+    [key: string]: string;
+  };
 };
 
 export class RedisReadModelStorage implements ReadModelStorage {
@@ -29,15 +37,7 @@ export class RedisReadModelStorage implements ReadModelStorage {
   private dataType;
   private indexes;
 
-  constructor({
-    uri,
-    dataType,
-    indexes,
-  }: {
-    uri: string;
-    dataType: string;
-    indexes: string[];
-  }) {
+  constructor({ uri, dataType, indexes }: RedisConstructorArg) {
     this.client = new Redis(uri);
     this.subscribeClient = new Redis(uri);
     this.dataType = dataType;
@@ -48,18 +48,18 @@ export class RedisReadModelStorage implements ReadModelStorage {
     const oldRecord = await this.client.hgetall(`${this.dataType}:${id}`);
     const pipeline = this.client.multi();
 
-    pipeline.hmset(`${this.dataType}:${id}`, updates);
+    pipeline.hset(`${this.dataType}:${id}`, updates);
     const indexesToUpdate = this.indexes.filter((index) => index in updates);
 
     for (const index of indexesToUpdate) {
       if (index in oldRecord)
         pipeline.lrem(
-          this.getRedisIndexKey(index, oldRecord[index]),
+          this.getIndexKey(index, oldRecord[index]),
           0,
           oldRecord.id
         );
 
-      pipeline.rpush(this.getRedisIndexKey(index, updates[index as any]), id);
+      pipeline.rpush(this.getIndexKey(index, updates[index as any]), id);
     }
     await pipeline.exec();
   }
@@ -70,7 +70,7 @@ export class RedisReadModelStorage implements ReadModelStorage {
 
   async findByIndex({ index, indexValue }: FindArgs) {
     const ids = await this.client.lrange(
-      this.getRedisIndexKey(index, indexValue),
+      this.getIndexKey(index, indexValue),
       0,
       -1
     );
@@ -79,7 +79,12 @@ export class RedisReadModelStorage implements ReadModelStorage {
     );
   }
 
-  getRedisIndexKey(index: string, value: string) {
+  async delete({ id }: { id: string }) {
+    const result = await this.client.hdel(`${this.dataType}:${id}`);
+    return result;
+  }
+
+  getIndexKey(index: string, value: string) {
     return `${this.dataType}:index:${index}:${value}`;
   }
 

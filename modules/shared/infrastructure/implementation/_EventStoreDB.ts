@@ -34,7 +34,7 @@ export class _EventStoreDB<EVENT extends EventData>
   implements EventStore<EVENT>
 {
   private client: EventStoreDBClient;
-  constructor(uri: string) {
+  constructor({ uri }: { uri: string }) {
     this.client = EventStoreDBClient.connectionString(uri);
   }
 

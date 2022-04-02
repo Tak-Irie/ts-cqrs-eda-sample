@@ -13,7 +13,9 @@ import {
 } from "./usecase/TaskBoardEventHandler.ts";
 
 const useWriteTaskBoard = () => {
-  const eventStore = new _EventStoreDB<TaskBoardEvents>(EVENT_STORE_URI);
+  const eventStore = new _EventStoreDB<TaskBoardEvents>({
+    uri: EVENT_STORE_URI,
+  });
   const taskBoardCommandHandler = new TaskBoardCommandHandler(eventStore);
 
   const taskAssigneeReadModelStorage = new RedisReadModelStorage({
