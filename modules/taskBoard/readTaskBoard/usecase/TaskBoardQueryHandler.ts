@@ -1,5 +1,7 @@
-import { RedisReadModelStorage } from "modules/shared/infrastructure/implementation/RedisReadModelStorage";
-import { _MessageHandler } from "modules/shared/usecase/_MessageHandler";
+import { RedisReadModelStorage } from "../../../shared/infrastructure/implementation/RedisReadModelStorage";
+import { _MessageHandler } from "../../../shared/usecase/_MessageHandler";
+import { deserializeJSON, serializeJSON } from "../../../shared/util/json";
+import { readAllStream } from "../../../shared/util/Stream";
 import { Readable } from "stream";
 import { StreamTaskOnTaskBoard, TaskBoardQueries } from "./TaskBoardQuery";
 
@@ -14,8 +16,9 @@ class TaskBoardQueryHandler implements _MessageHandler<TaskBoardQueries> {
     this.taskReadModelStorage = readModelStorage;
   }
 
-  async handleStreamTasksOnTaskBoard({ data }: StreamTaskOnTaskBoard) {
-    const { taskBoardId } = data;
+  async handleStreamTasksOnTaskBoard({
+    data: { taskBoardId },
+  }: StreamTaskOnTaskBoard) {
     const taskBoardStream = new Readable({ objectMode: true, read() {} });
     taskBoardStream.push(
       await this.taskReadModelStorage.findByIndex({
@@ -29,7 +32,9 @@ class TaskBoardQueryHandler implements _MessageHandler<TaskBoardQueries> {
       callback: (changedTasks) => taskBoardStream.push(changedTasks),
     });
 
-    return taskBoardStream;
+    const data = await readAllStream(taskBoardStream);
+
+    return deserializeJSON(data);
   }
 }
 

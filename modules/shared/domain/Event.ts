@@ -1,4 +1,4 @@
-import { generateId } from "../util/generateId";
+import { generateUUIDv4 } from "../util/generateId";
 import { JSONType } from "../util/SharedTypes";
 
 type MetadataType = JSONType | Uint8Array;
@@ -15,7 +15,7 @@ type EventType<
 class Event<TYPENAME extends string, DATA extends JSONType> {
   readonly type: TYPENAME;
   readonly data: DATA;
-  readonly id = generateId();
+  readonly id = generateUUIDv4();
   readonly metadata: MetadataType;
 
   private constructor(type: TYPENAME, data: DATA, metadata: MetadataType) {
@@ -41,7 +41,7 @@ const createEvent =
     return class Event {
       static readonly type: TypeName = type;
       readonly type = type;
-      readonly id = generateId();
+      readonly id = generateUUIDv4();
       readonly metadata = {};
 
       constructor(readonly data: Data) {}

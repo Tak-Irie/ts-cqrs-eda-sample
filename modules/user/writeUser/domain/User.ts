@@ -62,15 +62,11 @@ export class User extends Entity<UserProps> {
     const _userName = UserName.create({ userName: args.userName });
     if (_userName.isFailure) return false;
 
-    const event = Event.createEvent<"UserCreated", UserArgs>({
-      type: "UserCreated",
-      data: {
-        id: new UniqueEntityID().toString(),
-        email: _email.getValue().getValue(),
-        password: _password.getValue().getValue(),
-        userName: _userName.getValue().getValue(),
-      },
-      metadata: { NONE: "NONE" },
+    const event = Event.createEvent<UserArgs, "UserCreated">("UserCreated")({
+      id: new UniqueEntityID().toString(),
+      email: _email.getValue().getValue(),
+      password: _password.getValue().getValue(),
+      userName: _userName.getValue().getValue(),
     });
 
     return event;

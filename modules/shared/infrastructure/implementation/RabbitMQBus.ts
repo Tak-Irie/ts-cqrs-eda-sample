@@ -1,6 +1,6 @@
 import amqp from "amqplib";
 
-import { EventData } from "modules/shared/domain/_Event";
+import { EventData } from "../../../shared/domain/_Event";
 import {
   EventBus,
   SubscribeArg,

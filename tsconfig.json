@@ -6,11 +6,8 @@
       "es2020"
     ],
     "sourceMap": true,
-    "outDir": "./dist",
-    "rootDir": "./",
     "strict": true,
     "moduleResolution": "node",
-    "baseUrl": "./",
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

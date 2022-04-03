@@ -1,6 +1,6 @@
-import { RedisReadModelStorage } from "modules/shared/infrastructure/implementation/RedisReadModelStorage";
-import { _EventStoreDB } from "modules/shared/infrastructure/implementation/_EventStoreDB";
-import { useMessageForwarder } from "modules/shared/usecase/MessageForwarder";
+import { RedisReadModelStorage } from "../../../shared/infrastructure/implementation/RedisReadModelStorage";
+import { _EventStoreDB } from "../../../shared/infrastructure/implementation/_EventStoreDB";
+import { useMessageForwarder } from "../../../shared/usecase/MessageForwarder";
 import {
   TaskAddedToTaskBoard,
   TaskAssigneeChanged,
@@ -10,7 +10,7 @@ import {
   TaskRemovedFromTaskBoard,
   TaskStatusChanged,
   TaskTitleChanged,
-} from "modules/taskBoard/domain/TaskBoardEvents";
+} from "../../../taskBoard/domain/TaskBoardEvents";
 
 type TaskChangeArg = {
   taskId: string;

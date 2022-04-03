@@ -1,0 +1,35 @@
+type Query {
+  taskBoard(id: ID!): TaskBoard
+  task(id: ID!): Task
+}
+
+type Mutation {
+  addNewTaskToTaskBoard(
+    taskId: String!
+    taskBoardId: String!
+    title: String!
+    description: String!
+    status: String!
+    assigneeId: String!
+  ): Boolean!
+
+  updateTaskTitle(taskId: String, title: String): Boolean!
+  updateTaskDescription(taskId: String, description: String): Boolean!
+  updateTaskStatus(taskId: String, status: String): Boolean!
+  updateTaskAssignee(taskId: String, assigneeId: String): Boolean!
+  removeTaskFromTaskBoard(taskBoardId: String, taskId: String): Boolean!
+}
+
+type TaskBoard {
+  id: ID!
+  tasks: [Task]
+}
+
+type Task {
+  id: ID!
+  title: String
+  descriptions: String
+  status: String
+  assigneeId: String
+  taskBoardId: String
+}

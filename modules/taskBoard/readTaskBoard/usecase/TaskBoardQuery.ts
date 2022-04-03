@@ -1,18 +1,16 @@
-import { useMessageFactory } from "modules/shared/usecase/_Message";
+import { useMessageFactory } from "../../../shared/usecase/_Message";
 
-const createStreamTasksOnTaskBoardQuery = useMessageFactory<
+const createStreamTasksOnTaskBoard = useMessageFactory<
   "StreamTasksOnTaskBoard",
   { taskBoardId: string }
 >({ type: "StreamTasksOnTaskBoard" });
 
-type StreamTaskOnTaskBoard = ReturnType<
-  typeof createStreamTasksOnTaskBoardQuery
->;
+type StreamTaskOnTaskBoard = ReturnType<typeof createStreamTasksOnTaskBoard>;
 
 type TaskBoardQueries = StreamTaskOnTaskBoard;
 
 export {
   TaskBoardQueries,
   StreamTaskOnTaskBoard,
-  createStreamTasksOnTaskBoardQuery,
+  createStreamTasksOnTaskBoard,
 };

@@ -1,11 +1,11 @@
 import {
   ProjectCreated,
   TeamMemberRemovedFromTeam,
-} from "modules/project/domain/ProjectEvents";
-import { EventBus } from "modules/shared/infrastructure/EventBus";
-import { _EventStoreDB } from "modules/shared/infrastructure/implementation/_EventStoreDB";
-import { RedisReadModelStorage } from "modules/shared/infrastructure/implementation/RedisReadModelStorage";
-import { TaskBoardEvents } from "modules/taskBoard/domain/TaskBoardEvents";
+} from "../../../project/domain/ProjectEvents";
+import { EventBus } from "../../../shared/infrastructure/EventBus";
+import { _EventStoreDB } from "../../../shared/infrastructure/implementation/_EventStoreDB";
+import { RedisReadModelStorage } from "../../../shared/infrastructure/implementation/RedisReadModelStorage";
+import { TaskBoardEvents } from "../../../taskBoard/domain/TaskBoardEvents";
 import { createTaskBoard } from "../domain/TaskBoard";
 import { applyTaskEvents, updateAssignee, updateStatus } from "../domain/Task";
 

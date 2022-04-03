@@ -1,4 +1,4 @@
-import { useMessageFactory } from "modules/shared/usecase/_Message";
+import { useMessageFactory } from "../../../shared/usecase/_Message";
 
 const createAddNewTaskToTaskBoard = useMessageFactory<
   "AddNewTaskToTaskBoard",
@@ -56,8 +56,8 @@ type TaskBoardCommands =
   | UpdateTaskAssignee
   | RemoveTaskFromTaskBoard;
 
+export type { TaskBoardCommands };
 export {
-  TaskBoardCommands,
   AddNewTaskToTaskBoard,
   UpdateTaskTitle,
   UpdateTaskDescription,

@@ -1,4 +1,4 @@
-// import verify from "../../../shared/domain/verification/verify.js";
+// import verify from "../../../shared/domain/verification/verify";
 // import {
 //   Event,
 //   UserCreatedEvent,
@@ -6,10 +6,10 @@
 //   UserPasswordChangedEvent,
 //   UserEmailAddressChangedEvent,
 //   UserRoleChangedEvent,
-// } from "../../domain/events.js";
+// } from "../../domain/events";
 
-// import EmailAddress from "./email-address.js.js.js";
-// import Role from "./role.js.js.js";
+// import EmailAddress from "./email-address.js.js";
+// import Role from "./role.js.js";
 
 // type State = { id: string; password?: string };
 

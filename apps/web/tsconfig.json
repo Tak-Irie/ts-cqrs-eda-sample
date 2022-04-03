@@ -6,7 +6,7 @@
       "es2020",
       "dom"
     ],
-    "jsx": "react",
+    "jsx": "preserve",
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
@@ -17,14 +17,20 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
   "include": [
     "src/**/*"
   ],
   "exclude": [
     "dist",
-    "node_modules"
+    "node_modules",
+    "./**/generated"
   ],
   "compileOnSave": false
 }

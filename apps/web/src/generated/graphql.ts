@@ -17,7 +17,23 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addNewTaskToTaskBoard: Scalars['Boolean'];
   registerUser: User;
+  removeTaskFromTaskBoard: Scalars['Boolean'];
+  updateTaskAssignee: Scalars['Boolean'];
+  updateTaskDescription: Scalars['Boolean'];
+  updateTaskStatus: Scalars['Boolean'];
+  updateTaskTitle: Scalars['Boolean'];
+};
+
+
+export type MutationAddNewTaskToTaskBoardArgs = {
+  assigneeId: Scalars['String'];
+  description: Scalars['String'];
+  status: Scalars['String'];
+  taskBoardId: Scalars['String'];
+  taskId: Scalars['String'];
+  title: Scalars['String'];
 };
 
 
@@ -25,6 +41,36 @@ export type MutationRegisterUserArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
   userName: Scalars['String'];
+};
+
+
+export type MutationRemoveTaskFromTaskBoardArgs = {
+  taskBoardId?: InputMaybe<Scalars['String']>;
+  taskId?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateTaskAssigneeArgs = {
+  assigneeId?: InputMaybe<Scalars['String']>;
+  taskId?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateTaskDescriptionArgs = {
+  description?: InputMaybe<Scalars['String']>;
+  taskId?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateTaskStatusArgs = {
+  status?: InputMaybe<Scalars['String']>;
+  taskId?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateTaskTitleArgs = {
+  taskId?: InputMaybe<Scalars['String']>;
+  title?: InputMaybe<Scalars['String']>;
 };
 
 export type Profile = {
@@ -35,12 +81,40 @@ export type Profile = {
 
 export type Query = {
   __typename?: 'Query';
+  task?: Maybe<Task>;
+  taskBoard?: Maybe<TaskBoard>;
   user: User;
+};
+
+
+export type QueryTaskArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryTaskBoardArgs = {
+  id: Scalars['ID'];
 };
 
 
 export type QueryUserArgs = {
   id: Scalars['ID'];
+};
+
+export type Task = {
+  __typename?: 'Task';
+  assigneeId?: Maybe<Scalars['String']>;
+  descriptions?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  status?: Maybe<Scalars['String']>;
+  taskBoardId?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+};
+
+export type TaskBoard = {
+  __typename?: 'TaskBoard';
+  id: Scalars['ID'];
+  tasks?: Maybe<Array<Maybe<Task>>>;
 };
 
 export type User = {

@@ -1,5 +1,11 @@
 type Mutation {
+  addNewTaskToTaskBoard(assigneeId: String!, description: String!, status: String!, taskBoardId: String!, taskId: String!, title: String!): Boolean!
   registerUser(email: String!, password: String!, userName: String!): User!
+  removeTaskFromTaskBoard(taskBoardId: String, taskId: String): Boolean!
+  updateTaskAssignee(assigneeId: String, taskId: String): Boolean!
+  updateTaskDescription(description: String, taskId: String): Boolean!
+  updateTaskStatus(status: String, taskId: String): Boolean!
+  updateTaskTitle(taskId: String, title: String): Boolean!
 }
 
 type Profile {
@@ -8,7 +14,23 @@ type Profile {
 }
 
 type Query {
+  task(id: ID!): Task
+  taskBoard(id: ID!): TaskBoard
   user(id: ID!): User!
+}
+
+type Task {
+  assigneeId: String
+  descriptions: String
+  id: ID!
+  status: String
+  taskBoardId: String
+  title: String
+}
+
+type TaskBoard {
+  id: ID!
+  tasks: [Task]
 }
 
 type User {

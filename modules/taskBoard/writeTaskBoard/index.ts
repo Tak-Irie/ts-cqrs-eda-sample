@@ -1,9 +1,10 @@
-import { _EventStoreDB } from "modules/shared/infrastructure/implementation/_EventStoreDB";
+import { _EventStoreDB } from "../../shared/infrastructure/implementation/_EventStoreDB";
 import { RabbitMQBus } from "../../shared/infrastructure/implementation/RabbitMQBus";
 import { RedisReadModelStorage } from "../../shared/infrastructure/implementation/RedisReadModelStorage";
 import {
   EVENT_STORE_URI,
   MESSAGE_BROKER_URI,
+  REDIS_URI,
 } from "../../shared/util/Constants";
 import { TaskBoardEvents } from "../domain/TaskBoardEvents";
 import { TaskBoardCommandHandler } from "./usecase/TaskBoardCommandHandler";
@@ -19,7 +20,7 @@ const useWriteTaskBoard = () => {
   const taskBoardCommandHandler = new TaskBoardCommandHandler(eventStore);
 
   const taskAssigneeReadModelStorage = new RedisReadModelStorage({
-    uri: "task-board.redis",
+    uri: REDIS_URI,
     dataType: "taskAssignee",
     indexes: ["assigneeId"],
   });

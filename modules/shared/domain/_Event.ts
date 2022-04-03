@@ -1,5 +1,4 @@
 import { generateUUIDv4 } from "../util/generateId";
-import { JSONType } from "../util/SharedTypes";
 
 type MetadataType = {
   [key: string]: string | number;
@@ -33,4 +32,5 @@ const useEventFactory = <TYPE_NAME extends string, DATA extends DataType>({
   });
 };
 
-export { useEventFactory, EventData };
+export type { EventData };
+export { useEventFactory };

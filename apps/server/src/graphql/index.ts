@@ -2,7 +2,8 @@ import { readFileSync } from "fs";
 import { resolve } from "path";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 
-import { userResolver } from "./userResolver";
+// import { userResolver } from "./userResolver";
+import { taskBoardResolver } from "./taskBoardResolver";
 
 const typeDefs = readFileSync(
   resolve(__dirname, "./generated/schema.graphql")
@@ -10,7 +11,7 @@ const typeDefs = readFileSync(
 
 const schema = makeExecutableSchema({
   typeDefs,
-  resolvers: [userResolver],
+  resolvers: [taskBoardResolver],
 });
 
 export { schema };

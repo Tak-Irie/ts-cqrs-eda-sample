@@ -1,6 +1,6 @@
-import { RedisReadModelStorage } from "modules/shared/infrastructure/implementation/RedisReadModelStorage";
-import { _EventStoreDB } from "modules/shared/infrastructure/implementation/_EventStoreDB";
-import { EVENT_STORE_URI } from "modules/shared/util/Constants";
+import { RedisReadModelStorage } from "../../shared/infrastructure/implementation/RedisReadModelStorage";
+import { _EventStoreDB } from "../../shared/infrastructure/implementation/_EventStoreDB";
+import { EVENT_STORE_URI, REDIS_URI } from "../../shared/util/Constants";
 import { TaskBoardEvents } from "../domain/TaskBoardEvents";
 import TaskBoardReadModelProjection from "./usecase/TaskBoardProjection";
 import { TaskBoardQueryHandler } from "./usecase/TaskBoardQueryHandler";
@@ -11,7 +11,7 @@ const useReadTaskBoard = () => {
   });
 
   const taskReadModelStorage = new RedisReadModelStorage({
-    uri: "task-board.redis",
+    uri: REDIS_URI,
     dataType: "task",
     indexes: ["taskBoardId"],
   });

@@ -1,9 +1,9 @@
 import { mkdirSync } from "fs";
 import { writeFile } from "fs/promises";
 import { EventBus } from "./EventBus";
-import { EventStoreDB } from "./implementation/EventStoreDB.js";
+import { EventStoreDB } from "./implementation/EventStoreDB";
 
-import { deserializeJSON, serializeJSON } from "../util/json.js";
+import { deserializeJSON, serializeJSON } from "../util/json";
 
 type Options<T extends { type: string }> = {
   storageDirectory: string;

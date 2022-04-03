@@ -1,9 +1,9 @@
 // import { mkdirSync } from "fs";
 // import { writeFile } from "fs/promises";
-// import EventBus from "../event-bus/event-bus.js";
+// import EventBus from "../event-bus/event-bus";
 
-// import readFileWithFallback from "../filesystem/read-file-with-fallback.js";
-// import ConcurrencySafeFilesystemEventStore from "./concurrency-safe-filesystem-event-store.js";
+// import readFileWithFallback from "../filesystem/read-file-with-fallback";
+// import ConcurrencySafeFilesystemEventStore from "./concurrency-safe-filesystem-event-store";
 
 // type Options<Event extends { type: string }> = {
 //   storageDirectory: string;

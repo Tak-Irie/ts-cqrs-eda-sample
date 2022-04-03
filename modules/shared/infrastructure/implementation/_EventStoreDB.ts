@@ -7,7 +7,8 @@ import {
   AllStreamResolvedEvent,
   ResolvedEvent,
 } from "@eventstore/db-client";
-import { EventData } from "modules/shared/domain/_Event";
+import { generateUUIDv4 } from "../../../shared/util/generateId";
+import { EventData } from "../../../shared/domain/_Event";
 import { EventStore } from "../EventStore";
 
 type EventHandler<EVENT> = (event: EVENT) => void;
@@ -43,18 +44,28 @@ export class _EventStoreDB<EVENT extends EventData>
     event,
     expectedRevision,
   }: SaveArg<EVENT>): Promise<boolean> {
-    const events: JSONEventData[] = [];
-    if (Array.isArray(event)) {
-      event.forEach((e) => events.push(this.convertEventFromDomainToStore(e)));
-    } else {
-      events.push(this.convertEventFromDomainToStore(event));
-    }
+    try {
+      const events: JSONEventData[] = [];
+      if (Array.isArray(event)) {
+        event.forEach((e) =>
+          events.push(this.convertEventFromDomainToStore(e))
+        );
+      } else {
+        events.push(this.convertEventFromDomainToStore(event));
+      }
 
-    const res = await this.client.appendToStream(streamId, events, {
-      expectedRevision,
-    });
-    if (!res.success) return false;
-    return true;
+      console.log("streamId:", streamId);
+      console.log("event:", event);
+      console.log("expectedRevision:", expectedRevision);
+      const res = await this.client.appendToStream(streamId, events, {
+        expectedRevision,
+      });
+      if (!res.success) return false;
+      return true;
+    } catch (err) {
+      console.error("err:", err);
+      return false;
+    }
   }
 
   async load(streamId: string): Promise<LoadResult<EVENT> | false> {

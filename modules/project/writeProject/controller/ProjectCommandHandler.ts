@@ -1,8 +1,8 @@
 import {
   createTeamMemberRoleChanged,
   ProjectEvents,
-} from "modules/project/domain/ProjectEvents";
-import { _MessageHandler } from "modules/shared/usecase/_MessageHandler";
+} from "../../../project/domain/ProjectEvents";
+import { _MessageHandler } from "../../../shared/usecase/_MessageHandler";
 import { _EventStoreDB } from "../../../shared/infrastructure/implementation/_EventStoreDB";
 import {
   applyProjectEvents,

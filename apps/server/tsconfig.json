@@ -4,6 +4,7 @@
     "rootDir": "./",
     "outDir": "./dist",
     "target": "es5",
+    "baseUrl": "../../",
     "lib": [
       "esnext"
     ],
@@ -11,7 +12,7 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "incremental": true
   },
   "include": [

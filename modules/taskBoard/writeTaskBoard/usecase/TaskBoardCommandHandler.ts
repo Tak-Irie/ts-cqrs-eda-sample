@@ -1,6 +1,6 @@
-import { _EventStoreDB } from "modules/shared/infrastructure/implementation/_EventStoreDB.js";
-import { _MessageHandler } from "modules/shared/usecase/_MessageHandler.js";
-import { TaskBoardEvents } from "modules/taskBoard/domain/TaskBoardEvents.js";
+import { _EventStoreDB } from "../../../shared/infrastructure/implementation/_EventStoreDB";
+import { _MessageHandler } from "../../../shared/usecase/_MessageHandler";
+import { TaskBoardEvents } from "../../../taskBoard/domain/TaskBoardEvents";
 import {
   createTask,
   updateTitle,
@@ -8,23 +8,20 @@ import {
   updateDescription,
   updateAssignee,
   updateStatus,
-} from "../domain/Task.js";
-import {
-  addTask,
-  applyTaskBoardEvents,
-  removeTask,
-} from "../domain/TaskBoard.js";
+} from "../domain/Task";
+import { addTask, applyTaskBoardEvents, removeTask } from "../domain/TaskBoard";
 
 import {
   AddNewTaskToTaskBoard,
   RemoveTaskFromTaskBoard,
-  TaskBoardCommands,
   UpdateTaskAssignee,
   UpdateTaskDescription,
   UpdateTaskStatus,
   UpdateTaskTitle,
-} from "./TaskBoardCommands.js";
+} from "./TaskBoardCommands";
 
+import type { TaskBoardCommands } from "./TaskBoardCommands";
+import { generateULID } from "../../../shared/util/generateId";
 class TaskBoardCommandHandler implements _MessageHandler<TaskBoardCommands> {
   private eventStore: _EventStoreDB<TaskBoardEvents>;
 
@@ -33,36 +30,42 @@ class TaskBoardCommandHandler implements _MessageHandler<TaskBoardCommands> {
   }
 
   async handleAddNewTaskToTaskBoard({ data }: AddNewTaskToTaskBoard) {
-    const { taskId, taskBoardId, title, description, status, assigneeId } =
-      data;
-    const events = createTask({
-      id: taskId,
-      title,
-      description,
-      status,
-      assigneeId,
-    });
-    await this.eventStore.save({
-      streamId: `task/${taskId}`,
-      event: events,
-      expectedRevision: "no_stream",
-    });
-    const result = await this.eventStore.load(`task-board/${taskBoardId}`);
+    try {
+      const { taskId, taskBoardId, title, description, status, assigneeId } =
+        data;
 
-    if (result === false) return false;
+      const _id = generateULID();
+      const events = createTask({
+        id: _id,
+        title,
+        description,
+        status,
+        assigneeId,
+      });
+      await this.eventStore.save({
+        streamId: `task/${_id}`,
+        event: events,
+        expectedRevision: "no_stream",
+      });
+      const result = await this.eventStore.load(`task-board/${taskBoardId}`);
 
-    const newTaskBoardEvents = addTask(
-      applyTaskBoardEvents({}, result.events),
-      taskId
-    );
+      if (result === false) return false;
 
-    await this.eventStore.save({
-      streamId: `task-board/${taskBoardId}`,
-      event: newTaskBoardEvents,
-      expectedRevision: result.currentVersion,
-    });
+      const newTaskBoardEvents = addTask(
+        applyTaskBoardEvents({}, result.events),
+        _id
+      );
 
-    return true;
+      await this.eventStore.save({
+        streamId: `task-board/${taskBoardId}`,
+        event: newTaskBoardEvents,
+        expectedRevision: result.currentVersion,
+      });
+
+      return true;
+    } catch (err) {
+      console.error("err:", err);
+    }
   }
 
   async handleUpdateTaskTitle({ data }: UpdateTaskTitle) {

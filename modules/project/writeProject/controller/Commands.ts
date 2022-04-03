@@ -1,4 +1,4 @@
-import { useMessageFactory } from "modules/shared/usecase/_Message";
+import { useMessageFactory } from "../../../shared/usecase/_Message";
 
 const createCreateProject = useMessageFactory<
   "CreateProject",

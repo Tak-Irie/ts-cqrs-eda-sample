@@ -16,7 +16,23 @@ export type Scalars = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addNewTaskToTaskBoard: Scalars['Boolean'];
   registerUser: User;
+  removeTaskFromTaskBoard: Scalars['Boolean'];
+  updateTaskAssignee: Scalars['Boolean'];
+  updateTaskDescription: Scalars['Boolean'];
+  updateTaskStatus: Scalars['Boolean'];
+  updateTaskTitle: Scalars['Boolean'];
+};
+
+
+export type MutationAddNewTaskToTaskBoardArgs = {
+  assigneeId: Scalars['String'];
+  description: Scalars['String'];
+  status: Scalars['String'];
+  taskBoardId: Scalars['String'];
+  taskId: Scalars['String'];
+  title: Scalars['String'];
 };
 
 
@@ -24,6 +40,36 @@ export type MutationRegisterUserArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
   userName: Scalars['String'];
+};
+
+
+export type MutationRemoveTaskFromTaskBoardArgs = {
+  taskBoardId?: InputMaybe<Scalars['String']>;
+  taskId?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateTaskAssigneeArgs = {
+  assigneeId?: InputMaybe<Scalars['String']>;
+  taskId?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateTaskDescriptionArgs = {
+  description?: InputMaybe<Scalars['String']>;
+  taskId?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateTaskStatusArgs = {
+  status?: InputMaybe<Scalars['String']>;
+  taskId?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationUpdateTaskTitleArgs = {
+  taskId?: InputMaybe<Scalars['String']>;
+  title?: InputMaybe<Scalars['String']>;
 };
 
 export type Profile = {
@@ -34,12 +80,40 @@ export type Profile = {
 
 export type Query = {
   __typename?: 'Query';
+  task?: Maybe<Task>;
+  taskBoard?: Maybe<TaskBoard>;
   user: User;
+};
+
+
+export type QueryTaskArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryTaskBoardArgs = {
+  id: Scalars['ID'];
 };
 
 
 export type QueryUserArgs = {
   id: Scalars['ID'];
+};
+
+export type Task = {
+  __typename?: 'Task';
+  assigneeId?: Maybe<Scalars['String']>;
+  descriptions?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
+  status?: Maybe<Scalars['String']>;
+  taskBoardId?: Maybe<Scalars['String']>;
+  title?: Maybe<Scalars['String']>;
+};
+
+export type TaskBoard = {
+  __typename?: 'TaskBoard';
+  id: Scalars['ID'];
+  tasks?: Maybe<Array<Maybe<Task>>>;
 };
 
 export type User = {
@@ -127,6 +201,8 @@ export type ResolversTypes = ResolversObject<{
   Profile: ResolverTypeWrapper<Profile>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Task: ResolverTypeWrapper<Task>;
+  TaskBoard: ResolverTypeWrapper<TaskBoard>;
   User: ResolverTypeWrapper<User>;
 }>;
 
@@ -139,11 +215,19 @@ export type ResolversParentTypes = ResolversObject<{
   Profile: Profile;
   Query: {};
   String: Scalars['String'];
+  Task: Task;
+  TaskBoard: TaskBoard;
   User: User;
 }>;
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  addNewTaskToTaskBoard?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationAddNewTaskToTaskBoardArgs, 'assigneeId' | 'description' | 'status' | 'taskBoardId' | 'taskId' | 'title'>>;
   registerUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationRegisterUserArgs, 'email' | 'password' | 'userName'>>;
+  removeTaskFromTaskBoard?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, Partial<MutationRemoveTaskFromTaskBoardArgs>>;
+  updateTaskAssignee?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, Partial<MutationUpdateTaskAssigneeArgs>>;
+  updateTaskDescription?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, Partial<MutationUpdateTaskDescriptionArgs>>;
+  updateTaskStatus?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, Partial<MutationUpdateTaskStatusArgs>>;
+  updateTaskTitle?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, Partial<MutationUpdateTaskTitleArgs>>;
 }>;
 
 export type ProfileResolvers<ContextType = any, ParentType extends ResolversParentTypes['Profile'] = ResolversParentTypes['Profile']> = ResolversObject<{
@@ -153,7 +237,25 @@ export type ProfileResolvers<ContextType = any, ParentType extends ResolversPare
 }>;
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
+  task?: Resolver<Maybe<ResolversTypes['Task']>, ParentType, ContextType, RequireFields<QueryTaskArgs, 'id'>>;
+  taskBoard?: Resolver<Maybe<ResolversTypes['TaskBoard']>, ParentType, ContextType, RequireFields<QueryTaskBoardArgs, 'id'>>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
+}>;
+
+export type TaskResolvers<ContextType = any, ParentType extends ResolversParentTypes['Task'] = ResolversParentTypes['Task']> = ResolversObject<{
+  assigneeId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  descriptions?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  taskBoardId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type TaskBoardResolvers<ContextType = any, ParentType extends ResolversParentTypes['TaskBoard'] = ResolversParentTypes['TaskBoard']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  tasks?: Resolver<Maybe<Array<Maybe<ResolversTypes['Task']>>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
@@ -168,6 +270,8 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   Mutation?: MutationResolvers<ContextType>;
   Profile?: ProfileResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Task?: TaskResolvers<ContextType>;
+  TaskBoard?: TaskBoardResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 }>;
 

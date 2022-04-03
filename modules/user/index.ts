@@ -1,1 +1,2 @@
-export * from "./writeUser";
+// export * from "./writeUser";
+export const placer = 1;

@@ -1,4 +1,4 @@
-import { useEventFactory } from "modules/shared/domain/_Event";
+import { useEventFactory } from "../../shared/domain/_Event";
 
 const createProjectCreated = useEventFactory<
   "ProjectCreated",

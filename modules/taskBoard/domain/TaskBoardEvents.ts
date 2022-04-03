@@ -1,4 +1,4 @@
-import { useEventFactory } from "modules/shared/domain/_Event";
+import { useEventFactory } from "../../shared/domain/_Event";
 
 const createTaskCreated = useEventFactory<
   "TaskCreated",
@@ -89,8 +89,8 @@ type TaskBoardEvents =
   | TaskAddedToTaskBoard
   | TaskRemovedFromTaskBoard;
 
+export type { TaskBoardEvents };
 export {
-  TaskBoardEvents,
   createTaskAddedToTaskBoard,
   createTaskAssigneeChanged,
   createTaskBoardCreated,
